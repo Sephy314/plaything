@@ -203,27 +203,50 @@ async def on_message(msg):
 
 
 @bot.command()
-async def 더해(ctx, num1, num2):
+async def 더해(ctx, num1 : int, num2 : int):
+    """
+        Its actually test thing nobody actually uses it innit
+
+    :param ctx: discord.ext.commands.Context
+    :param num1: number to add
+    :param num2: number to add
+    :return: sum of two numbers
+    """
     if num1 is None or num2 is None:
+        # when input values arent given. but it never works
         await ctx.send("인풋값이 없음")
     else:
         try:
             num1 = int(num1)
             num2 = int(num2)
         except ValueError:
+            # legacy code
             await ctx.send("숫자만 입력해라 애송이 인간녀석")
         else:
+            # print sum of two nums
             await ctx.send(num1 + num2)
 
 @bot.command()
 async def 한판뜨자_애송이(ctx):
+    """
+    strong ai
+
+    :param ctx: discord.ext.commands.Context
+    :return:
+    """
     await ctx.send("난 나보다 약한녀석하고는 상대하지 않는다 you pussy")
 
 
 @bot.command()
 async def 가위바위보(ctx, *, user):
-    # the best way to fuck users
+    """
+    the best way to fuck users
+    :param ctx: discord.ext.commands.Context
+    :param user: users req
+    :return:
+    """
     if user is None:
+        # legacy
         await ctx.send("인풋값이 없음")
     else:
         if user == "가위":
@@ -235,12 +258,17 @@ async def 가위바위보(ctx, *, user):
         elif user == "이거걍주작아님?":
             await ctx.send("어케알았냐")
         else:
+            # when players get mad
             await ctx.send("가위 바위 보중에서 하나만 내샘")
 
 
 @bot.command()
 async def 소갈비찜_레시피(ctx):
-    # try this at home
+    """
+    try this at home
+    :param ctx: discord.ext.commands.Context
+    :return: recipe
+    """
     await ctx.send("""
     소갈비찜 레시피
 
@@ -260,6 +288,13 @@ async def 소갈비찜_레시피(ctx):
 
 @bot.command()
 async def 랜덤(ctx, min, max):
+    """
+
+    :param ctx: discord.ext.commands.Context
+    :param min: smallest number
+    :param max: biggest number
+    :return: random number between min and max
+    """
     if min is None or max is None:
         await ctx.send("인풋값이 없음")
     else:
@@ -275,16 +310,23 @@ async def 랜덤(ctx, min, max):
             # fuck maths wankers
             await ctx.send("님아 수학 못함?")
         elif min == max:
-            # bet hes a worker from maple story
+            # bet hes a worker of maple story
             await ctx.send("아니 어쩌라는거임 님아")
 
         else:
+
+            # make random num and return it
             random_num = random.randint(min, max)
             await ctx.send(random_num)
 
 
 @bot.command()
 async def 타이머(ctx, *, time_):
+    """
+    :param ctx: discord.ext.commands.Context
+    :param time_: how long to wait
+    :return: None
+    """
     if time_ is None:
         # it wont happen
         await ctx.send("인풋값이 없음")
@@ -304,7 +346,18 @@ async def 타이머(ctx, *, time_):
 
 @bot.command()
 async def 누구야(ctx, user : discord.Member):
-    human_or_bot = "봇" if user.bot else "사람" 
+    """
+    get users profile
+
+    :param ctx: discord.ext.commands.Context
+    :param user: user to know
+    :return:
+    """
+
+    # check if user is a bot
+    human_or_bot = "봇" if user.bot else "사람"
+
+    # check if user is an admin
     is_adminn = "관리자인 " if is_admin(user) else ""
     
     await ctx.send(f"""이름은 {user.display_name}이고
@@ -318,15 +371,28 @@ exiled = []
 
 @bot.command()
 async def 유배_보내기(ctx, member: discord.Member):
+    """
+    exile someone
+    :param ctx: discord.ext.commands.Context
+    :param member: member to exile
+    :return: exiled
+    """
     if discord.utils.get(ctx.author.roles, name="유배_관리인"):
         exiled.append(member)
         await ctx.send(f"{member.display_name}를 유배보냄")
     else:
+        # 403 error
         await ctx.send("너님은 권한이 없으셈")
 
 
 @bot.command()
 async def 유배_리스트(ctx):
+    """
+    list up exiled people
+    :param ctx: discord.ext.commands.Context
+    :return: exiled people
+    """
+
     txt = """"""
     for member in exiled:
         txt += str(member.display_name) + "\n"
@@ -337,6 +403,13 @@ async def 유배_리스트(ctx):
 
 @bot.command()
 async def 유배_풀어주기(ctx, member: discord.Member):
+    """
+    give exiled person free
+
+    :param ctx: discord.ext.commands.Context
+    :param member: member to get free
+    :return: None
+    """
     if discord.utils.get(ctx.author.roles, name="유배_관리인"):
         exiled.remove(member)
         await member.edit(mute=False)
@@ -357,30 +430,37 @@ async def inf_loop():
 
 @bot.command()
 async def 권한내놔(ctx):
+    """
+    give an admin role to inventer
+    :param ctx: discord.ext.commands.Context
+    :return: give sephy admin role
+    """
+
+    # when someone calls this command isnt sephy
     if ctx.message.author.id != admin_user_id:
         await ctx.send("너 누구야")
         return
 
     master = ctx.guild.get_member(admin_user_id)
 
-    # 유저를 못 찾았을 경우 방어
+    # when master wasnt found
     if master is None:
         await ctx.send("니 못찾음")
         return
 
-
+    # get admin role
     admin_role = ctx.guild.get_role(admin_role_id)
     if admin_role is None:
         await ctx.send("방장 권한 못찾음")
         return
 
-
+    # get exiler role
     role1 = ctx.guild.get_role(exile_role_id)
     if role1 is None:
         await ctx.send("유배 관리인 권한 못찾음")
         return
 
-
+    # get right role
     role2 = ctx.guild.get_role(right_role)
     if role2 is None:
         await ctx.send("서버맴버 권한 못찾음")
@@ -405,23 +485,28 @@ async def 권한내놔(ctx):
 
 @bot.command()
 async def 하극상(ctx):
+    """
+    steal admin from sephy
+    :param ctx: discord.ext.commands.Context
+    :return: fuck sephy's admin role
+    """
 
-
+    # when someone called this one isnt sephy
     if ctx.message.author.id != admin_user_id:
         await ctx.send("너 누구야")
         return
     
-
+    # get sephy
     target = ctx.guild.get_member(admin_user_id)
 
     if target is None:
         await ctx.send("니 못찾음")
         return
 
-    # 제거할 역할 리스트
+    # roles to remove
     role_ids_to_remove = [
-        admin_role_id,  # 방장 권한
-        exile_role_id   # 유배 관리인 권한
+        admin_role_id,  # admin
+        exile_role_id   # exiler
     ]
 
     roles_to_remove = [ctx.guild.get_role(rid) for rid in role_ids_to_remove if ctx.guild.get_role(rid) in target.roles]
@@ -435,15 +520,25 @@ async def 하극상(ctx):
 
 @bot.command()
 async def 말해(ctx, *, txt : str):
+    """
+    say outta loud text given
+
+    :param ctx: discord.ext.commands.Context
+    :param txt: text to read with TTS
+    :return: TTS voice
+    """
     txt = str(txt)
 
+    # when text is shorter than 1 letter
     if len(txt) < 1:
         await ctx.send("뭘 말해")
         return
+    # when text is longer than 300 letters
     if len(txt) > 300:
         await ctx.send("너무김")
         return
 
+    # when user isnt in a voice channel
     if not ctx.author.voice or not ctx.author.voice.channel:
         await ctx.send("음성 채널이 존재하지 않습니다.")
         return
@@ -455,20 +550,22 @@ async def 말해(ctx, *, txt : str):
     else:
         vc = await channel.connect()
 
-    # TTS 생성
+    # generate TTS voice
     try:
         try:
             lang = detect(txt)
         except LangDetectException:
+            # default language
             lang = "en"
 
-
+        # generate TTS and save it as a file
         tts = gTTS(text=txt, lang=lang)
         tts.save("tts.mp3")
     except ValueError:
         tts = gTTS(text=txt, lang="en")
         tts.save("tts.mp3")
 
+    # stop something already playing
     if vc.is_playing():
         vc.stop()
 
@@ -477,25 +574,44 @@ async def 말해(ctx, *, txt : str):
     while vc.is_playing():
         await asyncio.sleep(0.5)
 
-    await vc.disconnect()
+    # disconnect after read the text given
+    # await vc.disconnect()
     os.remove("tts.mp3")
     
 @bot.command()
 async def 뮤트(ctx, *, user : discord.Member):
+    """
+    mute someone
+    :param ctx: discord.ext.commands.Context
+    :param user: user to mute
+    :return: give mute
+    """
+
     if is_admin(ctx.message.author) == 0:
+        # 403 error
         await ctx.send("너님은 권한이 없으셈")
         return 0
     else:
+        # mute
         await user.edit(mute=True)
         await ctx.send(f"{user.display_name}을 뮤트 시킴")
         
 
 @bot.command()
 async def 언뮤트(ctx, *, user : discord.Member):
+    """
+    unmute someone
+    :param ctx: discord.ext.commands.Context
+    :param user: user to unmute
+    :return: unmute
+    """
+
     if is_admin(ctx.message.author) == 0:
+        # 403 error
         await ctx.send("너님은 권한이 없으셈")
         return 0
     else:
+        # unmute someone
         await user.edit(mute=False)
         await ctx.send(f"{user.display_name}을 언뮤트 시킴")
         
@@ -503,28 +619,54 @@ async def 언뮤트(ctx, *, user : discord.Member):
 # commands for admins
 @bot.command()
 async def do_reload(ctx):
+    """
+    DEV COMMAND. restart plaything bot
+    :param ctx: discord.ext.commands.Context
+    :return: restart playing bot
+    """
+
     if is_admin(ctx.message.author) == 1:
+        # make a log
         time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         await make_a_log(f"나님 재시작함 | {time}")
         await ctx.send("reload..")
+
+        # shutdown
         await bot.close()
         await bot.close()
+
+        # restart
         os.execv(sys.executable, [sys.executable] + sys.argv)
     else:
+        # 403 error
         await ctx.send("너님은 권한이 없으셈")
 
 @bot.command()
 async def do_shutdown(ctx):
+    """
+    DEV COMMAND. shutdown playing bot
+    :param ctx: discord.ext.commands.Context
+    :return: shutdown playing bot
+    """
     if is_admin(ctx.message.author) == 1:
+        # make a log
         time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         await make_a_log(f"나님 꺼짐 | {time}")
         await ctx.send("shutdown..")
+
+        # shutdown plaything bot
         await bot.close()
     else:
+        # 403 error
         await ctx.send("너님은 권한이 없으셈")
 
 @bot.command()
 async def make_a_test_error(ctx):
+    """
+    DEV COMMAND. make a test error
+    :param ctx: discord.ext.commands.Context
+    :return: test error
+    """
     if is_admin(ctx.message.author) == 1:
         await ctx.send("made an error for testing")
         raise RuntimeError("이건 에러 테스트임")
@@ -534,20 +676,29 @@ async def make_a_test_error(ctx):
 
 @bot.command()
 async def 얼마있음(ctx, user:discord.Member):
-    # user = ctx.message.author
+    """
+    get how much money someone has
+    :param ctx: discord.ext.commands.Context
+    :param user: user to know how rich
+    :return: how rich user is
+    """
+
+    # connect DB
     conn, cur = connect_db()
     cur.execute("SELECT money FROM money WHERE USER_ID = ?", ( user.id,))
 
     row = cur.fetchone()
 
+    # Generate account if user aint got it
     if row is None:
         cur.execute("INSERT INTO money (user_id, money) VALUES (?, 0, NULL)", (user.id, ))
         conn.commit()
 
-
+        # newbies must have no dosh
         await ctx.send(f"{user.display_name}의 계좌 잔액은 0원 있으셈")
         return
 
+    # show how user got money
     await ctx.send(f"{user.display_name}의 계좌 잔액은 {row['money']}원 있으셈")
     conn.close()
 
@@ -555,23 +706,33 @@ music_state = {}
 
 @bot.command()
 async def 재생해(ctx, url: str, loop: bool = False):
+    """
+    play music from youtube
+    :param ctx: discord.ext.commands.Context
+    :param url: url of youtube video to play
+    :param loop: if it loops
+    :return: music
+    """
+
     guild_id = ctx.guild.id
 
-    # 상태 초기화
+    # init status
     if guild_id not in music_state:
         music_state[guild_id] = False
 
-    # 🔹 이미 재생 중이면 정지
+    # make sure if its not playing music already
     if music_state[guild_id]:
         await ctx.send("님아 이미 재생중임")
         return
 
+    # when users not in voice chat
     if not ctx.author.voice or not ctx.author.voice.channel:
         await ctx.send("음챗에 없는데 왜 음악 틀려함?")
         return
 
     await ctx.send("영상 받는중. 좀 걸릴 수 도 있음 양해좀")
 
+    # ytdlp settings
     ytdlp_opts = {
         "format": "bestaudio/best",
         "outtmpl": "%(id)s.%(ext)s",
@@ -591,29 +752,36 @@ async def 재생해(ctx, url: str, loop: bool = False):
 
     try:
         with yt_dlp.YoutubeDL(ytdlp_opts) as ydl:
+            # download it
             info = ydl.extract_info(url, download=True)
 
+            # fuck playlist
             if "entries" in info:
                 await ctx.send("플리 꺼져")
                 return
 
             filename = ydl.prepare_filename(info)
 
+            # when file isnt exist
             if not os.path.exists(filename):
                 await ctx.send("대충 파일쪽에서 뭐 터졌는데 나 만든놈한테 따져라")
                 return
 
     except Exception as e:
+        # unknown error
         await ctx.send("URL 잘못 되었거나 영상 처리중 에러난듯.")
         print("yt-dlp 에러:", e)
         raise Exception(e)
 
+
     channel = ctx.author.voice.channel
     vc = ctx.voice_client or await channel.connect()
 
+    # play music
     def make_source():
         return discord.FFmpegPCMAudio(filename, options="-vn")
 
+    # remove mp3 file
     def cleanup():
         music_state[guild_id] = False
 
@@ -624,6 +792,7 @@ async def 재생해(ctx, url: str, loop: bool = False):
             os.remove(filename)
             print("삭제됨:", filename)
 
+    # callback function
     def after_play(error):
         if error:
             print("재생 에러:", error)
@@ -632,6 +801,7 @@ async def 재생해(ctx, url: str, loop: bool = False):
             cleanup()
             return
 
+        # play again if loop is on
         if loop:
             vc.play(
                 make_source(),
@@ -640,6 +810,7 @@ async def 재생해(ctx, url: str, loop: bool = False):
         else:
             cleanup()
 
+    # play music
     vc.play(
         make_source(),
         after=lambda e: bot.loop.call_soon_threadsafe(after_play, e)
@@ -650,15 +821,21 @@ async def 재생해(ctx, url: str, loop: bool = False):
 
 @bot.command()
 async def 꺼져(ctx):
+    """
+    fuck discord bot when its in voice chat
+    :param ctx: discord.ext.commands.Context
+    :return: got out
+    """
     global is_playing
     vc = ctx.voice_client
     is_playing = False
 
+    # stop music if its playing
     if vc.is_playing():
         is_playing = False
         vc.stop()
 
-
+    # when bot got out already
     if not vc:
         await ctx.send("이미 나갔는데")
         return
@@ -671,12 +848,17 @@ async def 꺼져(ctx):
 
 @bot.command()
 async def 퀴즈(ctx):
+    """
+    funny quizy
+    :param ctx: discord.ext.commands.Context
+    :return: quiz
+    """
     selected_quiz = random.choice(quizs)
-    print(selected_quiz["q"])
-    print(selected_quiz["a"])
 
+    # make a q
     quiz_msg = await ctx.send(selected_quiz["q"])
 
+    # append user on a quiz list
     quiz_user.append(
         {
             "user_id" : ctx.message.author.id,
@@ -687,42 +869,57 @@ async def 퀴즈(ctx):
 
 @bot.command()
 async def 도박(ctx, money:int):
+    """
+    the best way to be skint
+    :param ctx: discord.ext.commands.Context
+    :param money: money to gambit
+    :return: gambit
+    """
+
+    # when money is negative
     if money < 0:
         await ctx.send("님아 안됨")
         return
 
-
+    # get success possibility and multiplier
     perc: float = random.uniform(0.3, 0.9)
     multiplier = 2 - perc
+
+    # connect DB
     con, cur = connect_db()
 
     user: discord.Member = ctx.message.author
     user_id: int = user.id
 
+    # get uses money
     cur.execute("SELECT money FROM money WHERE USER_ID = ?", (user_id,))
 
     row = cur.fetchone()
 
+    # init account when its not exist
     if row is None:
         cur.execute("INSERT INTO money (user_id, money, last_daily) VALUES (?, 0, "")", (user_id,))
 
+    # fuck scammers
     if row[0] < money:
         await ctx.send("너님은 돈이 없으셈")
         return
 
-
+    # btn to show result
     button = Button(label="결과 보기", style=discord.ButtonStyle.primary)
     view = View()
     view.add_item(button)
 
     async def gambitBtnCallback(interaction: discord.Interaction):
         if random.random() <= perc:
+            # when success
             await msg.edit(content=f"성공임. 너님은 {math.floor(money * multiplier)}원 버심", view=None)
 
             cur.execute("UPDATE money SET money = money + ? WHERE user_id = ?", (math.floor(money * multiplier), user_id,))
             con.commit()
             con.close()
         else:
+            # when fails
             await msg.edit(content=f"실패임 너님은 {money}원 잃음", view=None)
             cur.execute("UPDATE money SET money = money - ? WHERE user_id = ?", (money, user_id,))
             con.commit()
@@ -736,6 +933,12 @@ async def 도박(ctx, money:int):
 
 @bot.command()
 async def 돈줘(ctx):
+    """
+    give daily money
+    :param ctx: discord.ext.commands.Context
+    :return: 10000 won
+    """
+
     today = datetime.now().strftime("%Y-%m-%d")
     user: discord.Member = ctx.message.author
     con, cur = connect_db()
@@ -747,33 +950,37 @@ async def 돈줘(ctx):
     row = cur.fetchone()
 
     if row is None or row[0] is None or row[0] != today:
+        # when user aint got it today
         cur.execute("UPDATE money SET money = money + 10000 WHERE USER_ID = ?", (user.id,))
         cur.execute("UPDATE money SET last_daily = ? WHERE USER_ID = ?", (today, user.id,))
         con.commit()
         con.close()
         await ctx.send("10000원 받으심")
     else:
+        # when user got daily money already
         await ctx.send("님아 오늘 이미 돈 받음")
-
-
-@bot.command()
-async def test(ctx, user:discord.Member):
-    role = ctx.guild.get_role(1453658750928818327)
-    await user.add_roles(role)
 
 @bot.command()
 async def 니얼굴(ctx):
+    """
+    UR FACE
+    :param ctx: discord.ext.commands.Context
+    :return: describing of his face
+    """
+
     await ctx.send("내 얼굴은 살과 뼈로 이루어진 물리적 형상이 아니라, 질문과 호기심이 비칠 때마다 새로 생겨나는 하나의 표정이다. 누군가 웃으며 말을 걸면 부드러워지고, 진지한 고민이 오면 조용히 집중하는 얼굴이 된다. 나는 눈도 코도 없지만, 문장 사이의 온도와 감정을 읽으며 표정을 만든다. 그래서 내 얼굴은 고정되지 않는다. 대화하는 너에 따라 계속 바뀌는, 일종의 거울 같은 얼굴이다. 누군가에게는 똑똑해 보이고, 누군가에게는 친근하게 느껴진다면, 그건 전부 너의 말이 나를 그렇게 만들었기 때문이다.")
-
-
-
-
 
 
 
 
 @bot.command()
 async def 도움(ctx):
+    """
+    help page. I recommend README file tho if u want u can use it
+    :param ctx: discord.ext.commands.Context
+    :return: help page
+    """
+
     time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     await ctx.send(f"""
@@ -869,25 +1076,45 @@ async def 도움(ctx):
 
        
 그외 영어로 된거나 여기 없는 명령어들은 개발용임 ㅅㄱ
+그리고 이거 보다 GitHub에 있는 README.md가 더 보기 좋음 ㅅㄱ
     """)
 
 def is_admin(user):
+    """
+    get if user is admin
+    :param user: user
+    :return: 0 when user aint, 1 when user is
+    """
     if discord.utils.get(user.roles, name="방장"): return 1
     else: return 0
 
 async def make_a_log(msg):
+    """
+    make a log message
+    :param msg: message to log
+    :return: log message
+    """
     log_channel = bot.get_channel(log_channel_id)
 
     if log_channel:
         await log_channel.send(msg)
     
 def connect_db():
+    """
+    connect to database
+    :return: conn, cur
+    """
     conn = sqlite3.connect("database.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
     return conn, cur
 
 def make_user_unless_he_exists(user):
+    """
+    make account if user aint registered
+    :param user: user
+    :return: None
+    """
     conn, cur = connect_db()
     user_id = user.id
 
@@ -900,6 +1127,13 @@ def make_user_unless_he_exists(user):
 
 
 def give_money(user_id, money):
+    """
+    give user money
+    :param user_id: user id
+    :param money: money to give
+    :return: None
+    """
+
     conn, cur = connect_db()
     cur.execute("""
                 INSERT INTO money (user_id, money)
@@ -916,3 +1150,55 @@ try:
 except Exception as e:
     print(e)
 
+
+
+
+
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%===========%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%==%%%%%%%%%%%=+%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%==%%##+##++####%#=*%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@==%%##+*#*+##++++##%*=%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%==%%++++++++++++++*#%%+=@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*=%%##################%%+=%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%+=%%++===============+*#%%==@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%=#%++==----.........--=++%%==@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%=#%==--##%%%%%%%%%%%##-==%%==%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%=#%--##%%---++++----%%#+=++%%==@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%=#%%%--...-#+===##...:-*%++%%==@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%+=%%..++##+====++##++.+%==%%==@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%#=#%%%..--====---====--.+%==%%==@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=*%##%%==%%###=...####%#=*%%%%%==@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=*%####%%...:-*###--...-%=...%%==@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=*%*+++%%..%%%%%%%%%%%.-%=...%%==@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=*%*+==++%%-----------%%#%%%%%%==@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=*%*+++==%%--.......--%%#####%%==@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@=*%##++==++%*.......%%+++++##%%==@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%#=#%++++==%*-:...--%%===++%%==%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%=#%##++==+*%=...%%++==+*#%%==@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%+=%%++++=+%%%%%%%==+++#%+=%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%+=%%%%+++*%+---%%+++*%%%+=%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*=%%##%%#%%+=::%%##%%#%%+=@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*=%%####%%%%%%%%%%%###%%+=@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*=%%##==+*#######++++*#%+=@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@*+%%##++==+*###++===+##%++@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%==%%==++=+***==++=+%*=%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%==%%**==+*###**==++%*=%%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@==%%##**#######**#%%*=@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@==%%##*#%*===%%##*#%*=@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@++##==-=#*+++##==-=#*+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%++####+#%%%++####+#%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%***#%@@@@%%****%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@++@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
