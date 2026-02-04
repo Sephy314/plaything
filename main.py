@@ -21,8 +21,7 @@ admin_user_id = int(os.getenv("ADMIN_USER"))
 admin_role_id = int(os.getenv("ADMIN_ROLE"))
 exile_role_id = int(os.getenv("EXILER_ROLE"))
 right_role = int(os.getenv("RIGHT_ROLE"))
-git add .
-git commit -m "Initial commit"
+
 
 TOKEN = os.getenv("DC")
 
