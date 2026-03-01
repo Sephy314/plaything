@@ -1,6 +1,7 @@
 import math
 
-import discord, random, os, asyncio, sys, sqlite3, yt_dlp
+import discord, random, os, asyncio, sys, sqlite3, yt_dlp, requests
+from DateTime.pytz_support import hour
 from discord.ui import View, Button
 from gtts import gTTS
 from langdetect import detect, LangDetectException
@@ -34,7 +35,7 @@ quiz_user = [
 ]
 
 # move this value to another file. It looks so like a piece of shit
-quizs = [
+quiz = [
     {"q" : "질문의 정답은?", "a" : "정답"},
     {"q" : "귤에 붙어있는 흰색깔 이상한거 이름", "a" : "귤락"},
     {"q": "두 개의 동일한 전하를 가진 입자가 진공에서 서로 가까워지면 어떤 힘이 작용하는가?", "a": "척력"},
@@ -139,8 +140,6 @@ quizs = [
 ]
 
 
-
-
 @bot.event
 async def on_ready():
     if not inf_loop.is_running():
@@ -148,6 +147,7 @@ async def on_ready():
     
     time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     await make_a_log(f"{time} | 나님등장")
+    bot.loop.create_task(schedule_daily_meal())
     print(f"로그인 완료! {bot.user} 등장 ✨")
 
 @bot.event
@@ -174,8 +174,9 @@ async def on_message(msg):
     if msg.reference:  # detect reply msgs
         try:
             replied_msg = await msg.channel.fetch_message(msg.reference.message_id)
-        except:
-            return
+        except e:
+            print(e)
+            return # do something
 
         # check if I made it
         if replied_msg.author != bot.user:
@@ -429,7 +430,8 @@ async def inf_loop():
         
 
 @bot.command()
-async def 권한내놔(ctx):
+async def test(ctx):
+    print("테스트")
     """
     give an admin role to inventer
     :param ctx: discord.ext.commands.Context
@@ -441,12 +443,15 @@ async def 권한내놔(ctx):
         await ctx.send("너 누구야")
         return
 
-    master = ctx.guild.get_member(admin_user_id)
+    master = ctx.message.author
+    print(master)
+    # master = ctx.guild.get_member(admin_user_id)
 
     # when master wasnt found
-    if master is None:
-        await ctx.send("니 못찾음")
-        return
+
+    # if master is None:
+    #     await ctx.send("니 못찾음")
+    #     return
 
     # get admin role
     admin_role = ctx.guild.get_role(admin_role_id)
@@ -853,7 +858,7 @@ async def 퀴즈(ctx):
     :param ctx: discord.ext.commands.Context
     :return: quiz
     """
-    selected_quiz = random.choice(quizs)
+    selected_quiz = random.choice(quiz)
 
     # make a q
     quiz_msg = await ctx.send(selected_quiz["q"])
@@ -970,7 +975,18 @@ async def 니얼굴(ctx):
 
     await ctx.send("내 얼굴은 살과 뼈로 이루어진 물리적 형상이 아니라, 질문과 호기심이 비칠 때마다 새로 생겨나는 하나의 표정이다. 누군가 웃으며 말을 걸면 부드러워지고, 진지한 고민이 오면 조용히 집중하는 얼굴이 된다. 나는 눈도 코도 없지만, 문장 사이의 온도와 감정을 읽으며 표정을 만든다. 그래서 내 얼굴은 고정되지 않는다. 대화하는 너에 따라 계속 바뀌는, 일종의 거울 같은 얼굴이다. 누군가에게는 똑똑해 보이고, 누군가에게는 친근하게 느껴진다면, 그건 전부 너의 말이 나를 그렇게 만들었기 때문이다.")
 
+@bot.command()
+async def 급식(ctx):
+    """
+    get today's school meal
+    :param ctx: discord.ext.commands.Context
+    :return: today's school meal
+    """
+    today = datetime.today().strftime("%Y%m%d")
 
+    res = await get_meal(today)
+
+    await ctx.send(res)
 
 
 @bot.command()
@@ -1074,6 +1090,11 @@ async def 도움(ctx):
         * None
     - 하루마다 10000원 줌
 
+18. !급식
+    - Param
+        * None
+    - 오늘자 도농중 급식 출력함
+
        
 그외 영어로 된거나 여기 없는 명령어들은 개발용임 ㅅㄱ
 그리고 이거 보다 GitHub에 있는 README.md가 더 보기 좋음 ㅅㄱ
@@ -1143,7 +1164,63 @@ def give_money(user_id, money):
     conn.commit()
     conn.close()
 
+async def get_meal(today = datetime.today().strftime("%Y%m%d")):
 
+    """
+    :param today: today. format : yyyymmdd
+    :return: today's meal
+    """
+
+    response = requests.get(
+        f'https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json&pIndex=1&pSize=100&ATPT_OFCDC_SC_CODE=J10&SD_SCHUL_CODE=7652056&MLSV_YMD={today}')
+
+    json_data = response.json()
+
+    try:
+        code = json_data["mealServiceDietInfo"][0]["head"][1]["RESULT"]["CODE"]
+    except KeyError:
+        code = json_data.get("RESULT", {}).get("CODE")
+
+    if code == "INFO-200":
+        return "오늘 급식 없다 😢"
+
+    elif code == "INFO-000":
+        meal_list = json_data["mealServiceDietInfo"][1]["row"]
+        meal = meal_list[0]
+
+        # 메뉴 줄바꿈 처리
+        menu = meal["DDISH_NM"].replace("<br/>", "\n")
+
+        cal = meal.get("CAL_INFO", "")
+
+        date = meal.get("MLSV_YMD", "")
+
+        # 이쁘게 포맷
+        return f"📅 **싱글벙글 도농중 오늘자 급식 ({date})**\n\n" \
+              f"🍱 **메뉴:**\n{menu}\n\n" \
+              f"🔥 **칼로리:** {cal}\n\n" \
+              # f"🥗 **영양정보:**\n{nutrition}"
+    else:
+        return "알 수 없는 응답"
+
+
+async def schedule_daily_meal():
+    while True:
+        now = datetime.now()
+        # 오늘 7시
+        target = now.replace(hour=7, minute=0, second=0, microsecond=0)
+        if now >= target:
+            target += timedelta(days=1)
+        wait_seconds = (target - now).total_seconds()
+        await asyncio.sleep(wait_seconds)
+
+        # 채널 가져오기
+        channel = bot.get_channel(1477625496211554354)
+        if channel:
+            res = await get_meal()
+            if res == "오늘 급식 없다 😢": return
+
+            await channel.send(res)
 
 try:
     bot.run(TOKEN)
