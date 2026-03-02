@@ -1218,6 +1218,9 @@ async def schedule_daily_meal():
         channel = bot.get_channel(1477625496211554354)
         if channel:
             res = await get_meal()
+
+            await make_a_log(res)
+
             if res == "오늘 급식 없다 😢": return
 
             await channel.send(res)
