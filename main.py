@@ -983,9 +983,7 @@ async def 급식(ctx):
     :param ctx: discord.ext.commands.Context
     :return: today's school meal
     """
-    today = datetime.now(ZoneInfo("Asia/Seoul")).strftime("%Y%m%d")
-
-    res = await get_meal(today)
+    res = await get_meal()
 
     await ctx.send(res)
 
