@@ -9,6 +9,7 @@ from discord.ext import commands
 from discord.ext import tasks
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
+from zoneinfo import ZoneInfo
 
 
 load_dotenv()
@@ -982,7 +983,7 @@ async def 급식(ctx):
     :param ctx: discord.ext.commands.Context
     :return: today's school meal
     """
-    today = datetime.today().strftime("%Y%m%d")
+    today = datetime.now(ZoneInfo("Asia/Seoul")).strftime("%Y%m%d")
 
     res = await get_meal(today)
 
@@ -1164,12 +1165,15 @@ def give_money(user_id, money):
     conn.commit()
     conn.close()
 
-async def get_meal(today = datetime.today().strftime("%Y%m%d")):
-
+async def get_meal(today=None):
     """
     :param today: today. format : yyyymmdd
     :return: today's meal
     """
+    if today is None:
+        today = datetime.now(ZoneInfo("Asia/Seoul")).strftime("%Y%m%d")
+
+    print(today)
 
     response = requests.get(
         f'https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json&pIndex=1&pSize=100&ATPT_OFCDC_SC_CODE=J10&SD_SCHUL_CODE=7652056&MLSV_YMD={today}')
