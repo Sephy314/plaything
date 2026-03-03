@@ -1171,7 +1171,12 @@ async def get_meal(today=None):
     :return: today's meal
     """
     if today is None:
-        today = datetime.now(ZoneInfo("Asia/Seoul")).strftime("%Y%m%d")
+        now = datetime.now(ZoneInfo("Asia/Seoul"))
+
+        if now.hour >= 18:
+            now = now + timedelta(days=1)
+
+        today = now.strftime("%Y%m%d")
 
     print(today)
 
@@ -1228,6 +1233,8 @@ async def schedule_daily_meal():
             if res == "오늘 급식 없다 😢": return
 
             await channel.send(res)
+
+
 
 try:
     bot.run(TOKEN)
