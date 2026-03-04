@@ -1213,7 +1213,7 @@ async def get_meal(today=None):
 
 async def schedule_daily_meal():
     while True:
-        now = datetime.now()
+        now = datetime.now(ZoneInfo("Asia/Seoul"))
         # 오늘 7시
         target = now.replace(hour=7, minute=0, second=0, microsecond=0)
         if now >= target:
@@ -1228,7 +1228,7 @@ async def schedule_daily_meal():
 
             await make_a_log(res)
 
-            if res == "오늘 급식 없다 😢": return
+            if res == "오늘 급식 없다 😢": continue
 
             await channel.send(res)
 
