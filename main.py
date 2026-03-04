@@ -161,7 +161,7 @@ async def on_command(ctx):
 
 @bot.event
 async def on_command_error(ctx, error):
-    time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    time = datetime.now(ZoneInfo("Asia/Seoul")).strftime("%Y-%m-%d %H:%M:%S")
     if isinstance(error, commands.CommandNotFound):
         # when users say bollocks
         await ctx.send("그딴 명령어는 없으셈")
@@ -1225,8 +1225,9 @@ async def schedule_daily_meal():
         channel = bot.get_channel(1477625496211554354)
         if channel:
             res = await get_meal()
+            time = datetime.now(ZoneInfo("Asia/Seoul")).strftime("%Y-%m-%d %H:%M:%S")
 
-            await make_a_log(res)
+            await make_a_log(f"{time} | 나님 작동함 | schedule_daily_meal")
 
             if res == "오늘 급식 없다 😢": continue
 
