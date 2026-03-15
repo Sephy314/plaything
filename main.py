@@ -1,4 +1,5 @@
 import math
+import subprocess
 
 import discord, random, os, asyncio, sys, sqlite3, yt_dlp, requests
 from DateTime.pytz_support import hour
@@ -30,6 +31,8 @@ TOKEN = os.getenv("DC")
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 is_playing = False
+
+mcserver_on = False
 
 quiz_user = [
 
@@ -554,8 +557,8 @@ async def 말해(ctx, *, txt : str):
     if ctx.voice_client:
         vc = ctx.voice_client
     else:
-        vc = await channel.connect()
-
+        vc = await channel.connect(reconnect=True)
+        await asyncio.sleep(1)
     # generate TTS voice
     try:
         try:
@@ -987,6 +990,62 @@ async def 급식(ctx):
 
     await ctx.send(res)
 
+@bot.command()
+async def 마크(ctx, act: str):
+    global mcserver_on
+    if act == "켜":
+        if mcserver_on:
+            await ctx.send("이미 켜짐")
+            return
+
+        mcserver_on = True
+        await ctx.send("마크 킴")
+        process = await asyncio.create_subprocess_exec(
+            "bash", "./mcsh/activeServer.sh",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+
+        stdout, stderr = await process.communicate()
+
+        # if process.returncode == 0:
+        await ctx.send("서버 실행 성공 ✅")
+        # else:
+            # await ctx.send(f"서버 실행 실패 ❌ (Exit code: {process.returncode})")
+
+    elif act == "꺼":
+        process = await asyncio.create_subprocess_exec(
+            "bash", "./mcsh/inactiveServer.sh",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+
+        stdout, stderr = await process.communicate()
+
+        mcserver_on = False
+
+        if process.returncode == 0:
+            await ctx.send("서버 디짐")
+
+        else:
+            await ctx.send(f"서버 안디짐 (returncode={process.returncode})")
+
+    elif act == "상태":
+        process = await asyncio.create_subprocess_exec(
+            "bash", "./mcsh/checkServerHealth.sh",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+
+        stdout, stderr = await process.communicate()
+
+        if process.returncode == 0:
+            await ctx.send("서버 꺼져있음")
+        elif process.returncode == 1:
+            await ctx.send("서버 켜져있음")
+
+
+    else: await ctx.send("사용법: !마크 <켜|꺼|상태창>  ")
 
 @bot.command()
 async def 도움(ctx):
@@ -1093,7 +1152,11 @@ async def 도움(ctx):
     - Param
         * None
     - 오늘자 도농중 급식 출력함
-
+    
+19. !마크
+    - Param
+        * act: AcrEnum(켜, 꺼, 상태)
+    - 마크 서버를 키거나 끄거나 상태 확인함
        
 그외 영어로 된거나 여기 없는 명령어들은 개발용임 ㅅㄱ
 그리고 이거 보다 GitHub에 있는 README.md가 더 보기 좋음 ㅅㄱ
