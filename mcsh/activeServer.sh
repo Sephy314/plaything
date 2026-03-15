@@ -20,7 +20,7 @@ fi
 
 cd "$SERVER_DIR" || { echo "Failed to cd into server directory"; exit 1; }
 
-nohub java -Xmx4G -Xms4G -jar server.jar nogui
+nohup java -Xmx4G -Xms4G -jar server.jar nogui
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -eq 0 ]; then
