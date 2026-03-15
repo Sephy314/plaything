@@ -1010,6 +1010,7 @@ async def 마크(ctx, act: str):
 
         if process.returncode == 0:
             await ctx.send("서버 실행 성공 ✅")
+        elif process.returncode == 143: pass
         else:
             await ctx.send(f"서버 실행 실패 ❌ (Exit code: {process.returncode})")
 
