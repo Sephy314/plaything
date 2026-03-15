@@ -1008,10 +1008,10 @@ async def 마크(ctx, act: str):
 
         stdout, stderr = await process.communicate()
 
-        # if process.returncode == 0:
-        await ctx.send("서버 실행 성공 ✅")
-        # else:
-            # await ctx.send(f"서버 실행 실패 ❌ (Exit code: {process.returncode})")
+        if process.returncode == 0:
+            await ctx.send("서버 실행 성공 ✅")
+        else:
+            await ctx.send(f"서버 실행 실패 ❌ (Exit code: {process.returncode})")
 
     elif act == "꺼":
         process = await asyncio.create_subprocess_exec(
