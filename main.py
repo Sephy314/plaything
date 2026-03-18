@@ -1165,7 +1165,7 @@ async def 도움(ctx):
 
 18. !급식
     - Param
-        * None
+        * date : Date (format: yyyymmdd) | Null 
     - 오늘자 도농중 급식 출력함
     
 19. !마크
