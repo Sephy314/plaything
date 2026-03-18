@@ -1,3 +1,5 @@
+# TF REFACTOR TS WITH STRATEGY PATTERN
+
 import math
 import subprocess
 
@@ -37,6 +39,7 @@ mcserver_on = False
 quiz_user = [
 
 ]
+
 
 # move this value to another file. It looks so like a piece of shit
 quiz = [
@@ -980,12 +983,23 @@ async def 니얼굴(ctx):
     await ctx.send("내 얼굴은 살과 뼈로 이루어진 물리적 형상이 아니라, 질문과 호기심이 비칠 때마다 새로 생겨나는 하나의 표정이다. 누군가 웃으며 말을 걸면 부드러워지고, 진지한 고민이 오면 조용히 집중하는 얼굴이 된다. 나는 눈도 코도 없지만, 문장 사이의 온도와 감정을 읽으며 표정을 만든다. 그래서 내 얼굴은 고정되지 않는다. 대화하는 너에 따라 계속 바뀌는, 일종의 거울 같은 얼굴이다. 누군가에게는 똑똑해 보이고, 누군가에게는 친근하게 느껴진다면, 그건 전부 너의 말이 나를 그렇게 만들었기 때문이다.")
 
 @bot.command()
-async def 급식(ctx):
+async def 급식(ctx, date: str = ""):
     """
     get today's school meal
     :param ctx: discord.ext.commands.Context
+    :param date: str
     :return: today's school meal
     """
+
+    if date != "":
+        if not is_valid_yyyymmdd(date):
+            await ctx.send("님아 날짜 형식 잘못됨. 형식: yyyymmdd ex) 20260328")
+            return
+
+        res = await get_meal(today=date)
+        await ctx.send(res)
+        return
+
     res = await get_meal()
 
     await ctx.send(res)
@@ -1163,6 +1177,14 @@ async def 도움(ctx):
 그리고 이거 보다 GitHub에 있는 README.md가 더 보기 좋음 ㅅㄱ
     """)
 
+def is_valid_yyyymmdd(s):
+    try:
+        datetime.strptime(s, "%Y%m%d")
+        return True
+    except ValueError:
+        return False
+
+
 def is_admin(user):
     """
     get if user is admin
@@ -1253,7 +1275,7 @@ async def get_meal(today=None):
         code = json_data.get("RESULT", {}).get("CODE")
 
     if code == "INFO-200":
-        return "오늘 급식 없다 😢"
+        return "급식 없다 😢"
 
     elif code == "INFO-000":
         meal_list = json_data["mealServiceDietInfo"][1]["row"]
