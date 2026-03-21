@@ -20,7 +20,7 @@ fi
 
 cd "$SERVER_DIR" || { echo "Failed to cd into server directory"; exit 1; }
 
-nohup java -Xmx5G -Xms5G -jar server.jar nogui
+nohup java -Xmx5G -Xms5G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+ParallelRefProcEnabled -jar server.jar nogui
 EXIT_CODE=$?
 
 if [ $EXIT_CODE -eq 0 ]; then
