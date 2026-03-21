@@ -166,7 +166,7 @@
 
 * **Param**
 
-  * None
+ * date : Date (format: yyyymmdd) | Null 
 * 오늘의 급식 받을 수 있음
 
 ---
